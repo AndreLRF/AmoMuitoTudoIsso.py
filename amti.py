@@ -1,3 +1,9 @@
+numeroPedido = 0
+filaClientesNormal = []
+filaClienteIdoso = []
+filaPedidos =[]
+filaEspera = []
+
 class Cliente:
     def __init__(self, *args, **kwarg):
         self.name = kwarg.get("name", "")
@@ -7,15 +13,15 @@ class Cliente:
 class Pedido:
     def __init__(self, *args, **kwarg):
         self.numero = kwarg.get("numero", 0)
-        self.item = kwarg.get("item", {} )
+        self.item = kwarg.get("item", [] )
         self.valorTotal = kwarg.get("valorTotal", 0)
         self.tempoPreparo = kwarg.get("tempoPreparo", 0)
 
-filaClientesNormal = []
-filaClienteIdoso = []
-filaPedidos =[]
-filaEspera = []
-numeroPedido = 0
+class Item:
+     def __init__(self, *args, **kwarg):
+        self.desc = kwarg.get("desc", "" )
+        self.valor = kwarg.get("valor", 0)
+        self.tempo = kwarg.get("tempo", 0)
 
 def inserirCliente(name, idade, **npedido):
     if idade <= 65:
@@ -38,32 +44,39 @@ def posicaoCliente():
     print("Não exite cliente com o nome informado.")
     return
 
-def pedido():
-   
+def escolherItem():
+    itens =[]
+    while True:
+        item = Item()
+        item.desc = input("Informe o item: ")
+        item.valor = input("Informe o valordo item: ")
+        item.tempo = input("Informe o tempo item: ")
+        opcao = input("Mais Itens? (sim ou nao)")  
+        if(opcao == "nao"):
+            break
+    itens.append(item)
+    pedido = Pedido(numeroPedido, itens, item.valor, item.tempo)
+    filaPedidos.append(pedido)
+    return
+
+def fazendoPedido():
+    global numeroPedido
+    numeroPedido = numeroPedido +1 
     if len(filaClienteIdoso) > 0:
-              
-        
-        numeroPedido = numeroPedido + 1
+        escolherItem()
         filaClienteIdoso[0].numeroPedido = numeroPedido
         filaEspera.append(filaClienteIdoso[0])
         filaClienteIdoso.pop(0)
         return
-        
+
     if len(filaClientesNormal) > 0:
-        numeroPedido = numeroPedido + 1
+        escolherItem()
         filaClientesNormal[0].numeroPedido = numeroPedido
         filaEspera.append(filaClientesNormal[0])
         filaClientesNormal.pop(0)
         return
- 
-    print("Nenhum cliente cadastrado ainda.")
 
+    print("Nenhum cliente cadastrado ainda.")
 
 inserirCliente(name="teste", idade=10)
 inserirCliente(name="testeIdoso", idade=70)
-
-for cliente in filaClienteIdoso:
-    print(cliente.name)
-
-for cliente in filaClientesNormal:
-    print(cliente.name)
