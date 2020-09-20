@@ -1,6 +1,6 @@
 numeroPedido = 0
 filaClientesNormal = []
-filaClienteIdoso = []
+filaClientesIdoso = []
 filaPedidos =[]
 filaEspera = []
 
@@ -28,48 +28,61 @@ def inserirCliente(name, idade, **npedido):
         filaClientesNormal.append(Cliente(name=name, idade=idade,
                                    npedido=npedido.get("npedido", None)))
     else:
-        filaClienteIdoso.append(Cliente(name=name, idade=idade,
+        filaClientesIdoso.append(Cliente(name=name, idade=idade,
                                  npedido=npedido.get("npedido", None)))
 
 def posicaoCliente():
     name = input("Informe um nome para a pesquisa: ")
-    for cliente in filaClienteIdoso:
+    posicaoI = 0
+    posicaoN = 0
+    for cliente in filaClientesIdoso:
+        posicaoI = posicaoI +1
         if name == cliente.name:
-            print("Posição do cliente na fila preferencial é: " + (filaClienteIdoso.index+1))
+            print("Posição do cliente na fila preferencial é: " + str(posicaoI))
             return
     for cliente in filaClientesNormal:
-        if name == cliente.name: 
-            print("Posição do cliente na fila preferencial é: " + (filaClientesNormal.index+1))
+        posicaoN = posicaoN +1
+        if name == cliente.name:
+            print("Posição do cliente na fila normal é: " + str(posicaoN))
             return
     print("Não exite cliente com o nome informado.")
     return
 
 def escolherItem():
+    global numeroPedido
     itens =[]
     while True:
         item = Item()
         item.desc = input("Informe o item: ")
-        item.valor = input("Informe o valordo item: ")
-        item.tempo = input("Informe o tempo item: ")
+        item.valor = float(input("Informe o valor do item: "))
+        item.tempo = int(input("Informe o tempo item: "))
+        itens.append(item)
         opcao = input("Mais Itens? (sim ou nao)")  
         if(opcao == "nao"):
             break
-    itens.append(item)
-    pedido = Pedido(numeroPedido, itens, item.valor, item.tempo)
+    valorTotal = 0
+    tempoTotal = 0
+    for iten in itens:
+        tempoTotal = tempoTotal + iten.tempo
+        valorTotal = valorTotal + iten.valor
+    pedido = Pedido(numero = numeroPedido, item = itens, valorTotal = valorTotal, tempoPreparo = tempoTotal)
     filaPedidos.append(pedido)
     return
+
 
 def fazendoPedido():
     global numeroPedido
     numeroPedido = numeroPedido +1 
-    if len(filaClienteIdoso) > 0:
+    if len(filaClientesIdoso) > 0:
+        print("CLIENTE SENDO ATENDIDO: " + filaClientesIdoso[0].name)        
+        filaClientesIdoso[0].numeroPedido = numeroPedido
         escolherItem()
-        filaClienteIdoso[0].numeroPedido = numeroPedido
-        filaEspera.append(filaClienteIdoso[0])
-        filaClienteIdoso.pop(0)
+        filaEspera.append(filaClientesIdoso[0])
+        filaClientesIdoso.pop(0)
         return
 
     if len(filaClientesNormal) > 0:
+        print("CLIENTE SENDO ATENDIDO: " + filaClientesNormal[0].name)
         escolherItem()
         filaClientesNormal[0].numeroPedido = numeroPedido
         filaEspera.append(filaClientesNormal[0])
@@ -78,5 +91,85 @@ def fazendoPedido():
 
     print("Nenhum cliente cadastrado ainda.")
 
-inserirCliente(name="teste", idade=10)
-inserirCliente(name="testeIdoso", idade=70)
+def chamarPedido():
+    callItem = int(input("Informe o numero do pedido que esta pronto: "))
+    for pedido in filaEspera:
+        if (callItem == pedido.numeroPedido):
+            filaEspera.pop()
+    for pedido in filaPedidos:
+        if (callItem == pedido.numero):
+            filaPedidos.pop()
+     
+print("######################  INICIO  ###################################")
+print("ADICIONANDO CLIENTES")
+inserirCliente(name="Teste", idade=49)
+inserirCliente(name="Teste2", idade=18)
+inserirCliente(name="Teste3", idade=68)
+print("DONE!!!")
+print("----------------------")
+print("LISTA NORMAL:")
+for cliente in filaClientesNormal:
+    print("     " + cliente.name)
+print("----------------------")
+print("LISTA IDOSO:")
+for cliente in filaClientesIdoso:
+    print("     " + cliente.name)
+print("----------------------")
+print("LISTA ESPERA:")
+for pedido in filaEspera:
+    print("     " + pedido)
+print("----------------------")
+print("LISTA PEDIDOS:")
+for pedidos in filaPedidos:
+    print("     " + pedidos)
+print("#########################################################")
+print("PROCURANDO CLIENTE NAS LISTAS")
+#posicaoCliente()
+#posicaoCliente()
+#posicaoCliente()
+print("#########################################################")
+print("FAZENDO PEDIDO")
+fazendoPedido()
+fazendoPedido()
+print("#########################################################")
+print("LISTA NORMAL:")
+for cliente in filaClientesNormal:
+    print("     " + cliente.name)
+print("----------------------")
+print("LISTA IDOSO:")
+for cliente in filaClientesIdoso:
+    print("     " + cliente.name)
+print("----------------------")
+print("LISTA ESPERA:")
+for espera in filaEspera:
+    print("    Nome: " + espera.name + " - Numero Pedido: " + str(espera.numeroPedido))
+print("----------------------")
+print("LISTA PEDIDOS:")
+for pedidos in filaPedidos:
+    print("   -Numero Pedido: " + str(pedidos.numero) + "\n   -Iten(s):") 
+    for item in pedidos.item:
+        print("      *" + item.desc)
+    print( "   -Valor(R$): " + str(pedidos.valorTotal) + "\n   -Tempo: " + str(pedidos.tempoPreparo) + " min(s).")
+print("#########################################################")
+print("CHAMANDO PEDIDO PEDIDO")
+chamarPedido()
+print("#########################################################")
+print("LISTA NORMAL:")
+for cliente in filaClientesNormal:
+    print("     " + cliente.name)
+print("----------------------")
+print("LISTA IDOSO:")
+for cliente in filaClientesIdoso:
+    print("     " + cliente.name)
+print("----------------------")
+print("LISTA ESPERA:")
+for espera in filaEspera:
+    print("    Nome: " + espera.name + " - Numero Pedido: " + str(espera.numeroPedido))
+print("----------------------")
+print("LISTA PEDIDOS:")
+for pedidos in filaPedidos:
+    print("   -Numero Pedido: " + str(pedidos.numero) + "\n   -Iten(s):") 
+    for item in pedidos.item:
+        print("      *" + item.desc)
+    print( "   -Valor(R$): " + str(pedidos.valorTotal) + "\n   -Tempo: " + str(pedidos.tempoPreparo) + " min(s).")
+print("#########################################################")
